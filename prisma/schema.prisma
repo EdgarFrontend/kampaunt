@@ -21,3 +21,10 @@ model VacuumHistory {
   status          String   // "completed" | "stopped"
   createdAtTs     DateTime @default(now())
 }
+
+model Configuration {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  value           String   // JSON encoded value
+  updatedAt       DateTime @updatedAt
+}

@@ -32,7 +32,7 @@ export function useVacuumation(currentVolumeLiters: number) {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  useEffect(() => {
+  const loadHistory = useCallback(() => {
     setIsLoadingHistory(true);
     fetch('/api/history')
       .then(res => res.json())
@@ -42,17 +42,18 @@ export function useVacuumation(currentVolumeLiters: number) {
       .catch(console.error)
       .finally(() => setIsLoadingHistory(false));
   }, []);
-  
-  // These are derived from state & current time
-  const [remaining, setRemaining] = useState(0);
-  const [elapsed, setElapsed] = useState(0);
-  
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const saveVacuumState = useCallback((state: VacuumationState) => {
-    localStorage.setItem(VACUUM_KEY, JSON.stringify(state));
-    setVacuumState(state);
-  }, []);
+  const deleteHistoryEntry = useCallback(async (id: string) => {
+    // Optimistic remove
+    setHistory((prev) => prev.filter((e) => e.id !== id));
+    try {
+      await fetch(`/api/history/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error('Failed to delete history entry', error);
+      // Reload to restore state on failure
+      loadHistory();
+    }
+  }, [loadHistory]);
 
   const addHistory = useCallback(async (entry: HistoryEntry) => {
     // Optimistic update
@@ -68,6 +69,16 @@ export function useVacuumation(currentVolumeLiters: number) {
       console.error('Failed to save history', error);
     }
   }, []);
+  const [remaining, setRemaining] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const saveVacuumState = useCallback((state: VacuumationState) => {
+    localStorage.setItem(VACUUM_KEY, JSON.stringify(state));
+    setVacuumState(state);
+  }, []);
+
 
   const completeProcess = useCallback((state: VacuumationState, status: 'completed' | 'stopped', finalElapsed: number) => {
     if (!state.startTime) return;
@@ -233,6 +244,8 @@ export function useVacuumation(currentVolumeLiters: number) {
     progress,
     history,
     isLoadingHistory,
+    loadHistory,
+    deleteHistoryEntry,
     start,
     pause,
     resume,

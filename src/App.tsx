@@ -7,9 +7,8 @@ import { Dashboard } from './app/pages/Dashboard/Dashboard';
 import { Calculator } from './app/pages/Calculator/Calculator';
 import { Configuration } from './app/pages/Configuration/Configuration';
 import { History } from './app/pages/History/History';
-import { useRecipe } from './hooks/useRecipe';
+import { useConfig } from './hooks/useConfig';
 import { useVacuumation } from './hooks/useVacuumation';
-import { useVacuumSettings } from './hooks/useVacuumSettings';
 import type { Page, PaintColor } from './types';
 
 const LITERS_KEY = 'kampaunt_liters';
@@ -34,8 +33,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [liters, setLiters] = useState<number>(loadLiters);
 
-  const { recipe, updateRecipe } = useRecipe();
-  const { durationMinutes, updateDuration } = useVacuumSettings();
+  const { recipe, durationMinutes, updateRecipe, updateDuration, resetConfig } = useConfig();
   const {
     vacuumState,
     remaining,
@@ -43,6 +41,8 @@ function App() {
     progress,
     history,
     isLoadingHistory,
+    loadHistory,
+    deleteHistoryEntry,
     start,
     pause,
     resume,
@@ -109,11 +109,17 @@ function App() {
               durationMinutes={durationMinutes}
               onUpdateRecipe={updateRecipe}
               onUpdateDuration={updateDuration}
+              onReset={resetConfig}
             />
           )}
 
           {currentPage === 'history' && (
-            <History history={history} isLoading={isLoadingHistory} />
+            <History
+              history={history}
+              isLoading={isLoadingHistory}
+              onLoad={loadHistory}
+              onDelete={deleteHistoryEntry}
+            />
           )}
         </div>
       </main>

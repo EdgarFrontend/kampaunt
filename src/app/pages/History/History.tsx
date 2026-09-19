@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import styles from './History.module.css';
 import type { HistoryEntry } from '../../../types';
 import { formatTime } from '../../../utils';
@@ -5,9 +6,16 @@ import { formatTime } from '../../../utils';
 interface HistoryProps {
   history: HistoryEntry[];
   isLoading?: boolean;
+  onLoad: () => void;
+  onDelete: (id: string) => void;
 }
 
-export function History({ history, isLoading }: HistoryProps) {
+export function History({ history, isLoading, onLoad, onDelete }: HistoryProps) {
+  // Load history when the page mounts
+  useEffect(() => {
+    onLoad();
+  }, [onLoad]);
+
   if (isLoading) {
     return (
       <div className={styles.page}>
@@ -57,6 +65,7 @@ export function History({ history, isLoading }: HistoryProps) {
                 <th>Объём</th>
                 <th>Длительность</th>
                 <th>Статус</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -71,12 +80,13 @@ export function History({ history, isLoading }: HistoryProps) {
                   <td>
                     {entry.color ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {entry.color.hex && (
-                          <div style={{ width: 12, height: 12, borderRadius: '50%', background: entry.color.hex, border: '1px solid var(--border)' }} />
-                        )}
-                        {!entry.color.hex && (
-                           <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#9CA3AF', border: '1px solid var(--border)' }} />
-                        )}
+                        <div style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: '50%',
+                          background: entry.color.hex || '#9CA3AF',
+                          border: '1px solid var(--border)'
+                        }} />
                         <span style={{ fontWeight: 600 }}>{entry.color.name}</span>
                       </div>
                     ) : (
@@ -100,13 +110,46 @@ export function History({ history, isLoading }: HistoryProps) {
                         </>
                       ) : (
                         <>
-                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                           </svg>
                           Остановлено
                         </>
                       )}
                     </span>
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => onDelete(entry.id)}
+                      title="Удалить запись"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        borderRadius: '6px',
+                        color: 'var(--text-tertiary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        transition: 'color 0.15s, background 0.15s',
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLButtonElement).style.color = '#ef4444';
+                        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)';
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-tertiary)';
+                        (e.currentTarget as HTMLButtonElement).style.background = 'none';
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               ))}

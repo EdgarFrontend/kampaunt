@@ -8,6 +8,7 @@ interface ConfigurationProps {
   durationMinutes: number;
   onUpdateRecipe: (recipe: Recipe) => void;
   onUpdateDuration: (minutes: number) => void;
+  onReset: () => void;
 }
 
 const PRESETS = [30, 45, 60, 90, 120];
@@ -22,6 +23,7 @@ export function Configuration({
   durationMinutes,
   onUpdateRecipe,
   onUpdateDuration,
+  onReset,
 }: ConfigurationProps) {
   const [localComponents, setLocalComponents] = useState<Component[]>(recipe.components);
   const [errors, setErrors] = useState<ComponentError[]>([]);
@@ -74,6 +76,7 @@ export function Configuration({
     setErrors([]);
     setLocalDuration(60);
     setDurationError('');
+    onReset();
   };
 
   const handleCancel = () => {
