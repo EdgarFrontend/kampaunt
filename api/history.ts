@@ -9,7 +9,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           createdAtTs: 'desc',
         },
       });
-      return res.status(200).json(history);
+      const mapped = history.map(item => ({
+        ...item,
+        color: item.colorName ? { name: item.colorName, hex: item.colorHex } : null
+      }));
+      return res.status(200).json(mapped);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: 'Failed to fetch history' });
@@ -28,8 +32,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           durationMinutes: data.durationMinutes,
           actualSeconds: data.actualSeconds,
           volumeLiters: data.volumeLiters,
-          colorName: data.colorName || null,
-          colorHex: data.colorHex || null,
+          colorName: data.color?.name || null,
+          colorHex: data.color?.hex || null,
           status: data.status,
         },
       });
