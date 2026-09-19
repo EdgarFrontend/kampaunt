@@ -42,6 +42,7 @@ function App() {
     elapsed,
     progress,
     history,
+    isLoadingHistory,
     start,
     pause,
     resume,
@@ -112,7 +113,7 @@ function App() {
           )}
 
           {currentPage === 'history' && (
-            <History history={history} />
+            <History history={history} isLoading={isLoadingHistory} />
           )}
         </div>
       </main>

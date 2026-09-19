@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model VacuumHistory {
+  id              String   @id @default(cuid())
+  date            String
+  createdAt       String
+  startTime       String
+  endTime         String
+  durationMinutes Int
+  actualSeconds   Int
+  volumeLiters    Float
+  colorName       String?
+  colorHex        String?
+  status          String   // "completed" | "stopped"
+  createdAtTs     DateTime @default(now())
+}

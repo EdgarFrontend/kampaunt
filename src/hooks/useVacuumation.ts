@@ -3,7 +3,6 @@ import type { VacuumationState, HistoryEntry, PaintColor, VacuumationStatus } fr
 import { generateId, formatTimeStamp } from '../utils';
 
 const VACUUM_KEY = 'kampaunt_vacuum';
-const HISTORY_KEY = 'kampaunt_history';
 
 function loadVacuumState(): VacuumationState {
   try {
@@ -27,17 +26,22 @@ function loadVacuumState(): VacuumationState {
   };
 }
 
-function loadHistory(): HistoryEntry[] {
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    if (raw) return JSON.parse(raw) as HistoryEntry[];
-  } catch {}
-  return [];
-}
 
 export function useVacuumation(currentVolumeLiters: number) {
   const [vacuumState, setVacuumState] = useState<VacuumationState>(loadVacuumState);
-  const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  useEffect(() => {
+    setIsLoadingHistory(true);
+    fetch('/api/history')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setHistory(data);
+      })
+      .catch(console.error)
+      .finally(() => setIsLoadingHistory(false));
+  }, []);
   
   // These are derived from state & current time
   const [remaining, setRemaining] = useState(0);
@@ -50,12 +54,19 @@ export function useVacuumation(currentVolumeLiters: number) {
     setVacuumState(state);
   }, []);
 
-  const addHistory = useCallback((entry: HistoryEntry) => {
-    setHistory((prev) => {
-      const updated = [entry, ...prev];
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-      return updated;
-    });
+  const addHistory = useCallback(async (entry: HistoryEntry) => {
+    // Optimistic update
+    setHistory((prev) => [entry, ...prev]);
+    
+    try {
+      await fetch('/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+    } catch (error) {
+      console.error('Failed to save history', error);
+    }
   }, []);
 
   const completeProcess = useCallback((state: VacuumationState, status: 'completed' | 'stopped', finalElapsed: number) => {
@@ -221,6 +232,7 @@ export function useVacuumation(currentVolumeLiters: number) {
     elapsed,
     progress,
     history,
+    isLoadingHistory,
     start,
     pause,
     resume,

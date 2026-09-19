@@ -4,9 +4,22 @@ import { formatTime } from '../../../utils';
 
 interface HistoryProps {
   history: HistoryEntry[];
+  isLoading?: boolean;
 }
 
-export function History({ history }: HistoryProps) {
+export function History({ history, isLoading }: HistoryProps) {
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <div className="card">
+          <div className={styles['empty-state']}>
+            <div className={styles['empty-title']}>Загрузка истории...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (history.length === 0) {
     return (
       <div className={styles.page}>
