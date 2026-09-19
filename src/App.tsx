@@ -33,7 +33,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [liters, setLiters] = useState<number>(loadLiters);
 
-  const { recipe, durationMinutes, updateRecipe, updateDuration, resetConfig } = useConfig();
+  const { recipe, durationMinutes, updateRecipe, updateDuration, resetConfig, isLoading } = useConfig();
   const {
     vacuumState,
     remaining,
@@ -88,6 +88,7 @@ function App() {
               elapsed={elapsed}
               progress={progress}
               durationMinutes={durationMinutes}
+              isLoadingConfig={isLoading}
               onStartVacuum={handleStartVacuum}
               onPauseVacuum={pause}
               onResumeVacuum={resume}

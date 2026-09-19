@@ -25,6 +25,7 @@ interface DashboardProps {
   elapsed: number;
   progress: number;
   durationMinutes: number;
+  isLoadingConfig?: boolean;
   onStartVacuum: (duration: number, color: PaintColor) => void;
   onPauseVacuum: () => void;
   onResumeVacuum: () => void;
@@ -40,6 +41,7 @@ export function Dashboard({
   elapsed,
   progress,
   durationMinutes,
+  isLoadingConfig,
   onStartVacuum,
   onPauseVacuum,
   onResumeVacuum,
@@ -158,9 +160,10 @@ export function Dashboard({
           remaining={remaining}
           elapsed={elapsed}
           progress={progress}
-          durationMinutes={vacuumState.durationMinutes || durationMinutes}
+          durationMinutes={(status === 'running' || status === 'paused') ? (vacuumState.durationMinutes || durationMinutes) : durationMinutes}
           color={vacuumState.color}
           liters={vacuumState.volumeLiters || liters}
+          isLoading={isLoadingConfig}
         />
 
         <div className={styles['vacuum-actions']}>

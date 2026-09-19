@@ -10,12 +10,13 @@ interface VacuumTimerProps {
   durationMinutes: number;
   color: PaintColor | null;
   liters: number;
+  isLoading?: boolean;
 }
 
 const RADIUS = 90;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export function VacuumTimer({ status, remaining, elapsed, progress, durationMinutes, color, liters }: VacuumTimerProps) {
+export function VacuumTimer({ status, remaining, elapsed, progress, durationMinutes, color, liters, isLoading }: VacuumTimerProps) {
   const offset = CIRCUMFERENCE * (1 - progress);
 
   const labelText = {
@@ -72,9 +73,13 @@ export function VacuumTimer({ status, remaining, elapsed, progress, durationMinu
           </svg>
 
           <div className={`${styles['ring-time']} ${styles[status]}`}>
-            {status === 'idle' || status === 'stopped'
-              ? `${durationMinutes}:00`
-              : formatTime(status === 'completed' ? 0 : remaining)}
+            {isLoading ? (
+              <span className={styles['skeleton-loader']} style={{ display: 'inline-block', width: '100px', height: '36px', borderRadius: '8px', verticalAlign: 'middle' }} />
+            ) : (
+              status === 'idle' || status === 'stopped'
+                ? `${durationMinutes}:00`
+                : formatTime(status === 'completed' ? 0 : remaining)
+            )}
           </div>
           <div className={styles['ring-label']}>{labelText}</div>
           
@@ -114,7 +119,13 @@ export function VacuumTimer({ status, remaining, elapsed, progress, durationMinu
 
       {status === 'idle' && (
         <div className={styles['idle-label']}>
-          Продолжительность: {durationMinutes} мин <br/>
+          Продолжительность: {isLoading ? (
+            <span className={styles['skeleton-loader']} style={{ display: 'inline-block', width: '36px', height: '14px', borderRadius: '4px', verticalAlign: 'middle', margin: '0 4px' }} />
+          ) : (
+            `${durationMinutes} мин`
+          )}
+          {isLoading && <br/>}
+          {!isLoading && <br/>}
           Объём: {liters} л
         </div>
       )}
