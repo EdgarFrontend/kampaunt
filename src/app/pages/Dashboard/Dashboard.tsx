@@ -29,7 +29,6 @@ interface DashboardProps {
   onPauseVacuum: () => void;
   onResumeVacuum: () => void;
   onStopVacuum: () => void;
-  onResetVacuum: () => void;
 }
 
 export function Dashboard({
@@ -45,7 +44,6 @@ export function Dashboard({
   onPauseVacuum,
   onResumeVacuum,
   onStopVacuum,
-  onResetVacuum,
 }: DashboardProps) {
   const [inputValue, setInputValue] = useState(String(liters));
   const [inputError, setInputError] = useState('');

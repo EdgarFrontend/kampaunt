@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { VacuumationState, HistoryEntry, PaintColor, VacuumationStatus } from '../types';
-import { generateId, formatDate, formatTimeStamp } from '../utils';
+import { generateId, formatTimeStamp } from '../utils';
 
 const VACUUM_KEY = 'kampaunt_vacuum';
 const HISTORY_KEY = 'kampaunt_history';
