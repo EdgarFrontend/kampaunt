@@ -73,13 +73,13 @@
 }
 
 .unit-kg {
-  background: #EFF6FF;
-  color: #1D4ED8;
+  background: var(--unit-kg-bg);
+  color: var(--unit-kg-fg);
 }
 
 .unit-g {
-  background: #F5F3FF;
-  color: #6D28D9;
+  background: var(--unit-g-bg);
+  color: var(--unit-g-fg);
 }
 
 /* Fullscreen styling (2x larger) */

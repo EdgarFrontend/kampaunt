@@ -89,12 +89,12 @@
 .volume-preset-btn--active {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .volume-preset-btn--active:hover {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 
@@ -234,7 +234,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,7 +301,7 @@
 }
 
 .fullscreen-inner {
-  transform: scale(1.4);
+  transform: scale(1.25);
   transform-origin: top center;
   margin-top: 40px;
 }
