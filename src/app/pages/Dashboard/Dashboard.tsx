@@ -254,6 +254,25 @@ export function Dashboard({
               {inputError && <div className="error-text">{inputError}</div>}
             </div>
           </div>
+
+          <div className={styles['volume-presets']}>
+            <span className={styles['volume-presets-label']}>Шаблоны:</span>
+            {[4, 10, 16].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                className={`${styles['volume-preset-btn']} ${liters === preset ? styles['volume-preset-btn--active'] : ''}`}
+                onClick={() => {
+                  setInputValue(String(preset));
+                  setInputError('');
+                  onLitersChange(preset);
+                }}
+              >
+                {preset} л
+              </button>
+            ))}
+          </div>
+
         </div>
 
         {/* Ingredients card */}
