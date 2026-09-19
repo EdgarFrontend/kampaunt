@@ -9,6 +9,7 @@ import { Configuration } from './app/pages/Configuration/Configuration';
 import { History } from './app/pages/History/History';
 import { useConfig } from './hooks/useConfig';
 import { useVacuumation } from './hooks/useVacuumation';
+import { useTheme } from './hooks/useTheme';
 import type { Page, PaintColor } from './types';
 
 const LITERS_KEY = 'kampaunt_liters';
@@ -32,6 +33,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [liters, setLiters] = useState<number>(loadLiters);
+  const { theme, toggleTheme } = useTheme();
 
   const { recipe, durationMinutes, updateRecipe, updateDuration, resetConfig, isLoading } = useConfig();
   const {
@@ -74,6 +76,8 @@ function App() {
           title={pageInfo.title}
           subtitle={pageInfo.subtitle}
           vacuumStatus={vacuumState.status}
+          theme={theme}
+          onToggleTheme={toggleTheme}
           onMenuToggle={() => setSidebarOpen((o) => !o)}
         />
 
