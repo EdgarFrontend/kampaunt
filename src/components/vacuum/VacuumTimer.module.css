@@ -55,7 +55,8 @@
 /* Vacuum Chamber and Bubbles */
 .vacuum-chamber {
   position: absolute;
-  inset: 24px; /* Gap between ring and chamber */
+  inset: 24px;
+  /* Gap between ring and chamber */
   border-radius: 50%;
   overflow: hidden;
   transition: background-color 0.5s ease;
@@ -76,12 +77,15 @@
     transform: translateY(0) scale(0.8);
     opacity: 0;
   }
+
   20% {
     opacity: 1;
   }
+
   80% {
     opacity: 0.8;
   }
+
   100% {
     transform: translateY(-220px) scale(1.5);
     opacity: 0;
@@ -180,7 +184,7 @@
 .ring-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-bottom: 4px;
@@ -313,6 +317,7 @@
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
