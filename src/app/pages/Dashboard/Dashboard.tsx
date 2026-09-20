@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import styles from './Dashboard.module.css';
 import { IngredientsTable } from '../../../components/calculator/IngredientsTable';
 import { VacuumTimer } from '../../../components/vacuum/VacuumTimer';
 import { calculateIngredients } from '../../../utils';
 import type { Recipe, VacuumationState, PaintColor } from '../../../types';
+import styles from './Dashboard.module.css';
 
 const COLOR_PRESETS = [
   { name: 'Белый', hex: '#FFFFFF' },
@@ -30,6 +30,7 @@ interface DashboardProps {
   onPauseVacuum: () => void;
   onResumeVacuum: () => void;
   onStopVacuum: () => void;
+  reset: () => void
 }
 
 export function Dashboard({
@@ -46,6 +47,7 @@ export function Dashboard({
   onPauseVacuum,
   onResumeVacuum,
   onStopVacuum,
+  reset
 }: DashboardProps) {
   const [inputValue, setInputValue] = useState(String(liters));
   const [inputError, setInputError] = useState('');
@@ -118,7 +120,7 @@ export function Dashboard({
     <>
       <div className={styles['card-header']}>
         <h3 className={styles['card-title']}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg onDoubleClick={reset} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="3" />
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
           </svg>

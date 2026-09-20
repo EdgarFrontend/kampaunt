@@ -14,11 +14,11 @@ function loadVacuumState(): VacuumationState {
       }
       return state;
     }
-  } catch {}
-  return { 
-    status: 'idle', 
-    startTime: null, 
-    endTime: null, 
+  } catch { }
+  return {
+    status: 'idle',
+    startTime: null,
+    endTime: null,
     durationMinutes: 60,
     pausedRemaining: null,
     color: null,
@@ -58,7 +58,7 @@ export function useVacuumation(currentVolumeLiters: number) {
   const addHistory = useCallback(async (entry: HistoryEntry) => {
     // Optimistic update
     setHistory((prev) => [entry, ...prev]);
-    
+
     try {
       await fetch('/api/history', {
         method: 'POST',
@@ -71,7 +71,7 @@ export function useVacuumation(currentVolumeLiters: number) {
   }, []);
   const [remaining, setRemaining] = useState(0);
   const [elapsed, setElapsed] = useState(0);
-  
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const saveVacuumState = useCallback((state: VacuumationState) => {
@@ -82,7 +82,7 @@ export function useVacuumation(currentVolumeLiters: number) {
 
   const completeProcess = useCallback((state: VacuumationState, status: 'completed' | 'stopped', finalElapsed: number) => {
     if (!state.startTime) return;
-    
+
     const now = Date.now();
     const completedState: VacuumationState = { ...state, status, pausedRemaining: null };
     localStorage.setItem(VACUUM_KEY, JSON.stringify(completedState));
@@ -119,10 +119,10 @@ export function useVacuumation(currentVolumeLiters: number) {
       if (state.status !== 'running' || !state.endTime || !state.startTime) return state;
       const now = Date.now();
       const totalSeconds = state.durationMinutes * 60;
-      
+
       const rem = Math.max(0, Math.ceil((state.endTime - now) / 1000));
       const el = Math.max(0, totalSeconds - rem);
-      
+
       setRemaining(rem);
       setElapsed(el);
 
@@ -154,8 +154,8 @@ export function useVacuumation(currentVolumeLiters: number) {
         setRemaining(0);
         setElapsed(0);
       } else if (vacuumState.status === 'paused' && vacuumState.pausedRemaining !== null) {
-         setRemaining(vacuumState.pausedRemaining);
-         setElapsed((vacuumState.durationMinutes * 60) - vacuumState.pausedRemaining);
+        setRemaining(vacuumState.pausedRemaining);
+        setElapsed((vacuumState.durationMinutes * 60) - vacuumState.pausedRemaining);
       }
     }
     return () => {
@@ -177,7 +177,7 @@ export function useVacuumation(currentVolumeLiters: number) {
     };
     saveVacuumState(state);
   }, [saveVacuumState, currentVolumeLiters]);
-  
+
   const pause = useCallback(() => {
     if (vacuumState.status !== 'running' || !vacuumState.endTime) return;
     const rem = Math.max(0, Math.ceil((vacuumState.endTime - Date.now()) / 1000));
@@ -201,21 +201,21 @@ export function useVacuumation(currentVolumeLiters: number) {
     };
     saveVacuumState(state);
   }, [vacuumState, saveVacuumState]);
-  
+
   const stop = useCallback(() => {
     if (vacuumState.status !== 'running' && vacuumState.status !== 'paused') return;
-    
+
     // Calculate final elapsed time
     let finalElapsed = 0;
     const totalSeconds = vacuumState.durationMinutes * 60;
-    
+
     if (vacuumState.status === 'paused' && vacuumState.pausedRemaining !== null) {
       finalElapsed = Math.max(0, totalSeconds - vacuumState.pausedRemaining);
     } else if (vacuumState.endTime) {
       const rem = Math.max(0, Math.ceil((vacuumState.endTime - Date.now()) / 1000));
       finalElapsed = Math.max(0, totalSeconds - rem);
     }
-    
+
     completeProcess(vacuumState, 'stopped', finalElapsed);
   }, [vacuumState, completeProcess]);
 
@@ -251,5 +251,6 @@ export function useVacuumation(currentVolumeLiters: number) {
     resume,
     stop,
     reset,
+    setVacuumState
   };
 }

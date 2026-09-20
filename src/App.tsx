@@ -19,7 +19,7 @@ function loadLiters(): number {
   try {
     const raw = localStorage.getItem(LITERS_KEY);
     if (raw) return parseFloat(raw);
-  } catch {}
+  } catch { }
   return 100;
 }
 
@@ -50,6 +50,7 @@ function App() {
     pause,
     resume,
     stop,
+    reset,
   } = useVacuumation(liters);
 
   const handleLitersChange = (val: number) => {
@@ -101,6 +102,7 @@ function App() {
                 onPauseVacuum={pause}
                 onResumeVacuum={resume}
                 onStopVacuum={stop}
+                reset={reset}
               />
             )
           )}
