@@ -4,41 +4,26 @@ import { generateId, formatTimeStamp } from '../utils';
 
 const VACUUM_KEY = 'kampaunt_vacuum';
 
-function idleState(durationMinutes = 60): VacuumationState {
-  return {
-    status: 'idle',
-    startTime: null,
-    endTime: null,
-    durationMinutes,
-    pausedRemaining: null,
-    color: null,
-    volumeLiters: 0,
-  };
-}
-
-function persistVacuumState(state: VacuumationState) {
-  localStorage.setItem(VACUUM_KEY, JSON.stringify(state));
-}
-
 function loadVacuumState(): VacuumationState {
   try {
     const raw = localStorage.getItem(VACUUM_KEY);
     if (raw) {
       const state = JSON.parse(raw) as VacuumationState;
-      const finishedWhileAway =
-        state.status === 'completed' ||
-        (state.status === 'running' && state.endTime != null && Date.now() >= state.endTime);
-
-      if (finishedWhileAway) {
-        const idle = idleState(state.durationMinutes);
-        persistVacuumState(idle);
-        return idle;
+      if (state.status === 'running' && state.endTime && Date.now() >= state.endTime) {
+        return { ...state, status: 'completed' };
       }
-
       return state;
     }
   } catch {}
-  return idleState();
+  return { 
+    status: 'idle', 
+    startTime: null, 
+    endTime: null, 
+    durationMinutes: 60,
+    pausedRemaining: null,
+    color: null,
+    volumeLiters: 0,
+  };
 }
 
 
@@ -90,7 +75,7 @@ export function useVacuumation(currentVolumeLiters: number) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const saveVacuumState = useCallback((state: VacuumationState) => {
-    persistVacuumState(state);
+    localStorage.setItem(VACUUM_KEY, JSON.stringify(state));
     setVacuumState(state);
   }, []);
 

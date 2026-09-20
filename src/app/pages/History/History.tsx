@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import styles from './History.module.css';
 import type { HistoryEntry } from '../../../types';
 import { formatTime } from '../../../utils';
+import { PageLoader } from '../../../components/ui/PageLoader';
 
 interface ProductionRow {
   name: string;
@@ -41,6 +42,7 @@ interface HistoryProps {
 
 export function History({ history, isLoading, onLoad, onDelete }: HistoryProps) {
   const [reportOpen, setReportOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<HistoryEntry | null>(null);
 
   useEffect(() => {
     onLoad();
@@ -53,15 +55,7 @@ export function History({ history, isLoading, onLoad, onDelete }: HistoryProps) 
   );
 
   if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <div className="card">
-          <div className={styles['empty-state']}>
-            <div className={styles['empty-title']}>Загрузка истории...</div>
-          </div>
-        </div>
-      </div>
-    );
+    return <PageLoader label="Загрузка истории..." />;
   }
 
   if (history.length === 0) {
@@ -225,27 +219,10 @@ export function History({ history, isLoading, onLoad, onDelete }: HistoryProps) 
                   </td>
                   <td>
                     <button
-                      onClick={() => onDelete(entry.id)}
+                      type="button"
+                      className={styles['delete-btn']}
+                      onClick={() => setPendingDelete(entry)}
                       title="Удалить запись"
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        borderRadius: '6px',
-                        color: 'var(--text-tertiary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        transition: 'color 0.15s, background 0.15s',
-                      }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLButtonElement).style.color = '#ef4444';
-                        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)';
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-tertiary)';
-                        (e.currentTarget as HTMLButtonElement).style.background = 'none';
-                      }}
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="3 6 5 6 21 6" />
@@ -262,6 +239,40 @@ export function History({ history, isLoading, onLoad, onDelete }: HistoryProps) 
           </table>
         </div>
       </div>
+
+      {pendingDelete && (
+        <div className={styles.modalOverlay} onClick={() => setPendingDelete(null)}>
+          <div
+            className={styles.modal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-history-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="delete-history-title" className={styles.modalTitle}>Удалить запись?</h3>
+            <p className={styles.modalSubtitle}>
+              {pendingDelete.color?.name
+                ? `Запись «${pendingDelete.color.name}», ${pendingDelete.volumeLiters} л от ${pendingDelete.createdAt} будет удалена без возможности восстановления.`
+                : `Запись ${pendingDelete.volumeLiters} л от ${pendingDelete.createdAt} будет удалена без возможности восстановления.`}
+            </p>
+            <div className={styles.modalActions}>
+              <button type="button" className="btn btn-secondary" onClick={() => setPendingDelete(null)}>
+                Отмена
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => {
+                  onDelete(pendingDelete.id);
+                  setPendingDelete(null);
+                }}
+              >
+                Удалить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

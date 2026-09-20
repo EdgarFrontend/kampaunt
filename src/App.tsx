@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './index.css';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import layoutStyles from './components/layout/Layout.module.css';
@@ -7,10 +6,12 @@ import { Dashboard } from './app/pages/Dashboard/Dashboard';
 import { Calculator } from './app/pages/Calculator/Calculator';
 import { Configuration } from './app/pages/Configuration/Configuration';
 import { History } from './app/pages/History/History';
+import { PageLoader } from './components/ui/PageLoader';
 import { useConfig } from './hooks/useConfig';
 import { useVacuumation } from './hooks/useVacuumation';
 import { useTheme } from './hooks/useTheme';
 import type { Page, PaintColor } from './types';
+import './index.css';
 
 const LITERS_KEY = 'kampaunt_liters';
 
@@ -83,21 +84,25 @@ function App() {
 
         <div className={layoutStyles.content}>
           {currentPage === 'dashboard' && (
-            <Dashboard
-              recipe={recipe}
-              liters={liters}
-              onLitersChange={handleLitersChange}
-              vacuumState={vacuumState}
-              remaining={remaining}
-              elapsed={elapsed}
-              progress={progress}
-              durationMinutes={durationMinutes}
-              isLoadingConfig={isLoading}
-              onStartVacuum={handleStartVacuum}
-              onPauseVacuum={pause}
-              onResumeVacuum={resume}
-              onStopVacuum={stop}
-            />
+            isLoading ? (
+              <PageLoader label="Загрузка данных..." />
+            ) : (
+              <Dashboard
+                recipe={recipe}
+                liters={liters}
+                onLitersChange={handleLitersChange}
+                vacuumState={vacuumState}
+                remaining={remaining}
+                elapsed={elapsed}
+                progress={progress}
+                durationMinutes={durationMinutes}
+                isLoadingConfig={isLoading}
+                onStartVacuum={handleStartVacuum}
+                onPauseVacuum={pause}
+                onResumeVacuum={resume}
+                onStopVacuum={stop}
+              />
+            )
           )}
 
           {currentPage === 'calculator' && (
