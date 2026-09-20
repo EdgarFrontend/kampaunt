@@ -252,7 +252,7 @@ export function Dashboard({
                 style={{ maxWidth: 180 }}
                 value={inputValue}
                 onChange={(e) => handleLitersChange(e.target.value)}
-                min="0.1"
+                min="1"
                 step="1"
                 placeholder="Например: 100"
               />
