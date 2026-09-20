@@ -106,9 +106,8 @@ export function Configuration({
               <div key={component.id} className={styles['component-card']}>
                 <div className={styles['component-header']}>
                   <span className={styles['component-name']}>{component.name}</span>
-                  <span className={`${styles['component-unit-tag']} ${
-                    component.unit === 'кг' ? styles['unit-kg'] : styles['unit-g']
-                  }`}>
+                  <span className={`${styles['component-unit-tag']} ${component.unit === 'кг' ? styles['unit-kg'] : styles['unit-g']
+                    }`}>
                     {component.unit}
                   </span>
                 </div>
@@ -120,8 +119,8 @@ export function Configuration({
                     className={`input ${err ? 'input-error' : ''}`}
                     value={component.amountPerLiter}
                     onChange={(e) => handleComponentChange(component.id, e.target.value)}
-                    min="0.001"
-                    step="0.001"
+                    min="1"
+                    step="1"
                   />
                   <span className={styles['unit-label']}>{component.unit}</span>
                 </div>

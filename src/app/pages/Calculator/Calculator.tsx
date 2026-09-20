@@ -47,7 +47,7 @@ export function Calculator({ recipe, liters, onLitersChange }: CalculatorProps) 
               style={{ width: 180 }}
               value={inputValue}
               onChange={(e) => handleChange(e.target.value)}
-              min="0.1"
+              min="1"
               step="1"
               placeholder="100"
             />
@@ -85,14 +85,14 @@ export function Calculator({ recipe, liters, onLitersChange }: CalculatorProps) 
             <span className={styles['card-badge']}>
               {recipe.components.length} компонентов
             </span>
-            <button 
-               className="btn btn-ghost btn-icon" 
-               onClick={() => setCalcFullscreen(true)}
-               title="Развернуть"
+            <button
+              className="btn btn-ghost btn-icon"
+              onClick={() => setCalcFullscreen(true)}
+              title="Развернуть"
             >
-               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-               </svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
             </button>
           </div>
         </div>
