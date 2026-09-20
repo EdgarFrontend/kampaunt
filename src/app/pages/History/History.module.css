@@ -1,6 +1,28 @@
 .page {
   max-width: 900px;
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.page :global(.card) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 0; /* Let the table touch the bottom or keep padding inside scroll */
+}
+
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  margin: 0 -20px;
+  padding: 0 20px;
+  padding-bottom: 20px; /* Restore bottom padding inside scroll */
 }
 
 .empty-state {

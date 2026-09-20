@@ -18,6 +18,8 @@ function buildProductionReport(history: HistoryEntry[]): ProductionRow[] {
   const totals = new Map<string, ProductionRow>();
 
   for (const entry of history) {
+    if (entry.status === 'stopped') continue;
+
     const name = entry.color?.name?.trim() || 'Без цвета';
     const hex = entry.color?.hex;
     const key = `${name.toLowerCase()}|${hex ?? ''}`;
@@ -155,7 +157,7 @@ export function History({ history, isLoading, onLoad, onDelete }: HistoryProps) 
           </div>
         )}
 
-        <div style={{ overflowX: 'auto' }}>
+        <div className={styles['table-wrapper']}>
           <table className={styles.table}>
             <thead>
               <tr>
