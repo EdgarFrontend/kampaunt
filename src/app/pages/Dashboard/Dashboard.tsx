@@ -9,6 +9,7 @@ const COLOR_PRESETS = [
   { name: 'Белый', hex: '#FFFFFF' },
   { name: 'Чёрный', hex: '#111827' },
   { name: 'Красный', hex: '#EF4444' },
+  { name: 'Розовый', hex: '#FF3278' },
   { name: 'Оранжевый', hex: '#F97316' },
   { name: 'Жёлтый', hex: '#fae829' },
   { name: 'Зелёный', hex: '#22C55E' },
