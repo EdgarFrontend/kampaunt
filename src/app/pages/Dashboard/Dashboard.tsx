@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IngredientsTable } from '../../../components/calculator/IngredientsTable';
 import { VacuumTimer } from '../../../components/vacuum/VacuumTimer';
-import { calculateIngredients, formatTime } from '../../../utils';
+import { calculateIngredients } from '../../../utils';
 import type { Recipe, VacuumationState, PaintColor, PaintTask } from '../../../types';
 import styles from './Dashboard.module.css';
 
