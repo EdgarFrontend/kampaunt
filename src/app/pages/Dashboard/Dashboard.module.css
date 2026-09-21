@@ -6,7 +6,7 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto;
   gap: 20px;
   min-width: 0;
 }
@@ -111,13 +111,6 @@
   grid-column: 1;
   grid-row: 2;
   overflow: hidden;
-  min-width: 0;
-}
-
-/* Tasks card */
-.tasks-card {
-  grid-column: 1 / -1;
-  grid-row: 3;
   min-width: 0;
 }
 

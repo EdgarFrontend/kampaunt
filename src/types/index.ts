@@ -64,7 +64,7 @@ export interface HistoryEntry {
   status: 'completed' | 'stopped';
 }
 
-export type Page = 'dashboard' | 'calculator' | 'configuration' | 'history';
+export type Page = 'dashboard' | 'calculator' | 'configuration' | 'history' | 'tasks';
 
 export interface PaintTask {
   id: string;

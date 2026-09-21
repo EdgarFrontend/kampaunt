@@ -6,12 +6,13 @@ import { Dashboard } from './app/pages/Dashboard/Dashboard';
 import { Calculator } from './app/pages/Calculator/Calculator';
 import { Configuration } from './app/pages/Configuration/Configuration';
 import { History } from './app/pages/History/History';
+import { TasksPage } from './app/pages/Tasks/TasksPage';
 import { PageLoader } from './components/ui/PageLoader';
 import { useConfig } from './hooks/useConfig';
 import { useVacuumation } from './hooks/useVacuumation';
 import { useTheme } from './hooks/useTheme';
 import { useTasks } from './hooks/useTasks';
-import type { Page, PaintColor } from './types';
+import type { Page, PaintColor, PaintTask } from './types';
 import './index.css';
 
 const LITERS_KEY = 'kampaunt_liters';
@@ -29,12 +30,14 @@ const pageTitles: Record<Page, { title: string; subtitle: string }> = {
   calculator: { title: 'Калькулятор', subtitle: 'Расчёт компонентов' },
   configuration: { title: 'Конфигурация', subtitle: 'Настройка рецепта' },
   history: { title: 'История процессов', subtitle: 'Архив вакумации' },
+  tasks: { title: 'Задачи', subtitle: 'Планирование производства' },
 };
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [liters, setLiters] = useState<number>(loadLiters);
+  const [pendingLaunchTask, setPendingLaunchTask] = useState<PaintTask | null>(null);
   const { theme, toggleTheme } = useTheme();
 
   const { recipe, durationMinutes, updateRecipe, updateDuration, resetConfig, isLoading } = useConfig();
@@ -54,7 +57,7 @@ function App() {
     reset,
   } = useVacuumation(liters);
 
-  const { tasks, addTask, removeTask, updateTaskStatus } = useTasks();
+  const { tasks, addTask, removeTask, updateTaskStatus, isLoading: isTasksLoading } = useTasks();
 
   const handleLitersChange = (val: number) => {
     setLiters(val);
@@ -63,6 +66,13 @@ function App() {
 
   const handleStartVacuum = (duration: number, color: PaintColor) => {
     start(duration, color);
+  };
+
+  const handleLaunchTask = (task: PaintTask) => {
+    setPendingLaunchTask(task);
+    handleLitersChange(task.liters);
+    updateTaskStatus(task.id, 'in-progress');
+    setCurrentPage('dashboard');
   };
 
   const pageInfo = pageTitles[currentPage];
@@ -106,10 +116,8 @@ function App() {
                 onResumeVacuum={resume}
                 onStopVacuum={stop}
                 reset={reset}
-                tasks={tasks}
-                onAddTask={addTask}
-                onRemoveTask={removeTask}
-                onUpdateTaskStatus={updateTaskStatus}
+                pendingLaunchTask={pendingLaunchTask}
+                clearPendingLaunchTask={() => setPendingLaunchTask(null)}
               />
             )
           )}
@@ -138,6 +146,17 @@ function App() {
               isLoading={isLoadingHistory}
               onLoad={loadHistory}
               onDelete={deleteHistoryEntry}
+            />
+          )}
+
+          {currentPage === 'tasks' && (
+            <TasksPage
+              tasks={tasks}
+              onAddTask={addTask}
+              onRemoveTask={removeTask}
+              onUpdateTaskStatus={updateTaskStatus}
+              onLaunchTask={handleLaunchTask}
+              isLoading={isTasksLoading}
             />
           )}
         </div>

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IngredientsTable } from '../../../components/calculator/IngredientsTable';
 import { VacuumTimer } from '../../../components/vacuum/VacuumTimer';
-import { TaskList } from '../../../components/tasks/TaskList';
 import { calculateIngredients, formatTime } from '../../../utils';
 import type { Recipe, VacuumationState, PaintColor, PaintTask } from '../../../types';
 import styles from './Dashboard.module.css';
@@ -35,11 +34,9 @@ interface DashboardProps {
   onResumeVacuum: () => void;
   onStopVacuum: () => void;
   reset: () => void;
-  // Tasks
-  tasks: PaintTask[];
-  onAddTask: (colorName: string, liters: number, colorHex?: string) => void;
-  onRemoveTask: (id: string) => void;
-  onUpdateTaskStatus: (id: string, status: PaintTask['status']) => void;
+  // External Task Launch
+  pendingLaunchTask: PaintTask | null;
+  clearPendingLaunchTask: () => void;
 }
 
 export function Dashboard({
@@ -57,10 +54,8 @@ export function Dashboard({
   onResumeVacuum,
   onStopVacuum,
   reset,
-  tasks,
-  onAddTask,
-  onRemoveTask,
-  onUpdateTaskStatus,
+  pendingLaunchTask,
+  clearPendingLaunchTask,
 }: DashboardProps) {
   const [inputValue, setInputValue] = useState(String(liters));
   const [inputError, setInputError] = useState('');
@@ -76,6 +71,16 @@ export function Dashboard({
   // Color input state
   const [colorName, setColorName] = useState('');
   const [colorHex, setColorHex] = useState('');
+
+  // Handle pending launch task from other pages
+  useEffect(() => {
+    if (pendingLaunchTask) {
+      setColorName(pendingLaunchTask.colorName);
+      setColorHex(pendingLaunchTask.colorHex || '');
+      setShowColorModal(true);
+      clearPendingLaunchTask();
+    }
+  }, [pendingLaunchTask, clearPendingLaunchTask]);
 
   // Standalone timer (Задача 2)
   const [standaloneSeconds, setStandaloneSeconds] = useState<number | null>(null);
@@ -166,17 +171,6 @@ export function Dashboard({
 
   const handleCancelStop = () => {
     setShowStopModal(false);
-  };
-
-  // Launch a task: set liters + pre-fill color modal
-  const handleLaunchTask = (task: PaintTask) => {
-    setInputValue(String(task.liters));
-    setInputError('');
-    onLitersChange(task.liters);
-    setColorName(task.colorName);
-    setColorHex(task.colorHex || '');
-    onUpdateTaskStatus(task.id, 'in-progress');
-    setShowColorModal(true);
   };
 
   const status = vacuumState.status;
@@ -415,17 +409,6 @@ export function Dashboard({
         {/* Vacuum card */}
         <div className={`card ${styles['vacuum-card']}`}>
           {renderVacuumContent(false)}
-        </div>
-
-        {/* Tasks card */}
-        <div className={`card ${styles['tasks-card']}`}>
-          <TaskList
-            tasks={tasks}
-            onAddTask={onAddTask}
-            onRemoveTask={onRemoveTask}
-            onUpdateTaskStatus={onUpdateTaskStatus}
-            onLaunchTask={handleLaunchTask}
-          />
         </div>
       </div>
 
