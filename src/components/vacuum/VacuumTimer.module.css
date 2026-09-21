@@ -9,6 +9,35 @@
   position: relative;
   width: 220px;
   height: 220px;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.ring-wrapper--fullscreen {
+  width: 360px;
+  height: 360px;
+}
+
+.ring-wrapper--fullscreen .glass-plate {
+  width: 238px;
+  height: 238px;
+}
+
+.ring-wrapper--fullscreen .ring-icon {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+}
+
+.ring-wrapper--fullscreen .ring-time {
+  font-size: 4rem;
+}
+
+.ring-wrapper--fullscreen .ring-label {
+  font-size: 0.875rem;
+}
+
+.ring-wrapper--fullscreen .ring-percent {
+  font-size: 1rem;
 }
 
 .ring-svg {
@@ -50,6 +79,17 @@
 .ring-track.completed {
   stroke: var(--success);
   filter: drop-shadow(0 0 6px rgba(22, 163, 74, 0.35));
+}
+
+.ring-track.standalone {
+  stroke: var(--warning);
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.45));
+  animation: standalone-pulse 2s ease-in-out infinite;
+}
+
+@keyframes standalone-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3)); }
+  50% { filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7)); }
 }
 
 /* Vacuum Chamber and Bubbles */
@@ -179,6 +219,10 @@
 
 .ring-time.completed {
   color: var(--success);
+}
+
+.ring-time.standalone {
+  color: var(--warning);
 }
 
 .ring-label {

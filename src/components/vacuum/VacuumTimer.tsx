@@ -12,13 +12,24 @@ interface VacuumTimerProps {
   color: PaintColor | null;
   liters: number;
   isLoading?: boolean;
+  isFullscreen?: boolean;
+  standaloneTimer?: number | null;
+  isStandaloneTimerRunning?: boolean;
 }
 
 const RADIUS = 90;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export function VacuumTimer({ status, remaining, elapsed, progress, durationMinutes, color, liters, isLoading }: VacuumTimerProps) {
+export function VacuumTimer({ status, remaining, elapsed, progress, durationMinutes, color, liters, isLoading, isFullscreen, standaloneTimer, isStandaloneTimerRunning }: VacuumTimerProps) {
   const offset = CIRCUMFERENCE * (1 - progress);
+
+  // Standalone timer is shown only when vacuum is idle/stopped/completed
+  const showStandalone = isStandaloneTimerRunning && (status === 'idle' || status === 'stopped' || status === 'completed');
+  const totalTimerSeconds = durationMinutes * 60;
+  const standaloneProgress = (showStandalone && standaloneTimer != null && totalTimerSeconds > 0)
+    ? (totalTimerSeconds - standaloneTimer) / totalTimerSeconds
+    : 0;
+  const standaloneOffset = CIRCUMFERENCE * (1 - standaloneProgress);
 
   const labelText = {
     idle: 'Готово к вакумации',
@@ -46,7 +57,7 @@ export function VacuumTimer({ status, remaining, elapsed, progress, durationMinu
 
   return (
     <div className={styles.container}>
-      <div className={styles['ring-wrapper']}>
+      <div className={`${styles['ring-wrapper']} ${isFullscreen ? styles['ring-wrapper--fullscreen'] : ''}`}>
         {/* Vacuum Chamber Background */}
         <div 
           className={styles['vacuum-chamber']} 
@@ -82,12 +93,12 @@ export function VacuumTimer({ status, remaining, elapsed, progress, durationMinu
             r={RADIUS}
           />
           <circle
-            className={`${styles['ring-track']} ${styles[status]}`}
+            className={`${styles['ring-track']} ${showStandalone ? styles['standalone'] : styles[status]}`}
             cx="100"
             cy="100"
             r={RADIUS}
             strokeDasharray={CIRCUMFERENCE}
-            strokeDashoffset={status === 'idle' || status === 'stopped' ? CIRCUMFERENCE : offset}
+            strokeDashoffset={showStandalone ? standaloneOffset : (status === 'idle' || status === 'stopped' ? CIRCUMFERENCE : offset)}
           />
         </svg>
 
@@ -117,16 +128,20 @@ export function VacuumTimer({ status, remaining, elapsed, progress, durationMinu
               )}
             </svg>
 
-            <div className={`${styles['ring-time']} ${styles[status]}`}>
+            <div className={`${styles['ring-time']} ${showStandalone ? styles['standalone'] : styles[status]}`}>
               {isLoading ? (
                 <span className={styles['skeleton-loader']} style={{ display: 'inline-block', width: '100px', height: '36px', borderRadius: '8px', verticalAlign: 'middle' }} />
+              ) : showStandalone && standaloneTimer != null ? (
+                formatTime(standaloneTimer)
               ) : (
                 status === 'idle' || status === 'stopped'
                   ? `${durationMinutes}:00`
                   : formatTime(status === 'completed' ? 0 : remaining)
               )}
             </div>
-            <div className={styles['ring-label']}>{labelText}</div>
+            <div className={styles['ring-label']}>
+              {showStandalone ? 'Таймер' : labelText}
+            </div>
             
             {(status === 'running' || status === 'paused') && (
               <div className={styles['ring-percent']}>

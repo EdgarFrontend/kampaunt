@@ -65,3 +65,12 @@ export interface HistoryEntry {
 }
 
 export type Page = 'dashboard' | 'calculator' | 'configuration' | 'history';
+
+export interface PaintTask {
+  id: string;
+  colorName: string;
+  colorHex?: string;
+  liters: number;
+  status: 'pending' | 'in-progress' | 'done';
+  createdAt: number;
+}

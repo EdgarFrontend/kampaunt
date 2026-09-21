@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { IngredientsTable } from '../../../components/calculator/IngredientsTable';
 import { VacuumTimer } from '../../../components/vacuum/VacuumTimer';
-import { calculateIngredients } from '../../../utils';
-import type { Recipe, VacuumationState, PaintColor } from '../../../types';
+import { TaskList } from '../../../components/tasks/TaskList';
+import { calculateIngredients, formatTime } from '../../../utils';
+import type { Recipe, VacuumationState, PaintColor, PaintTask } from '../../../types';
 import styles from './Dashboard.module.css';
 
 const COLOR_PRESETS = [
@@ -33,7 +34,12 @@ interface DashboardProps {
   onPauseVacuum: () => void;
   onResumeVacuum: () => void;
   onStopVacuum: () => void;
-  reset: () => void
+  reset: () => void;
+  // Tasks
+  tasks: PaintTask[];
+  onAddTask: (colorName: string, liters: number, colorHex?: string) => void;
+  onRemoveTask: (id: string) => void;
+  onUpdateTaskStatus: (id: string, status: PaintTask['status']) => void;
 }
 
 export function Dashboard({
@@ -50,7 +56,11 @@ export function Dashboard({
   onPauseVacuum,
   onResumeVacuum,
   onStopVacuum,
-  reset
+  reset,
+  tasks,
+  onAddTask,
+  onRemoveTask,
+  onUpdateTaskStatus,
 }: DashboardProps) {
   const [inputValue, setInputValue] = useState(String(liters));
   const [inputError, setInputError] = useState('');
@@ -66,6 +76,47 @@ export function Dashboard({
   // Color input state
   const [colorName, setColorName] = useState('');
   const [colorHex, setColorHex] = useState('');
+
+  // Standalone timer (Задача 2)
+  const [standaloneSeconds, setStandaloneSeconds] = useState<number | null>(null);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearTimer = useCallback(() => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+  }, []);
+
+  const handleTimerToggle = useCallback(() => {
+    if (isTimerRunning) {
+      // Сброс
+      clearTimer();
+      setIsTimerRunning(false);
+      setStandaloneSeconds(null);
+    } else {
+      // Старт
+      const totalSeconds = durationMinutes * 60;
+      setStandaloneSeconds(totalSeconds);
+      setIsTimerRunning(true);
+      timerIntervalRef.current = setInterval(() => {
+        setStandaloneSeconds((prev) => {
+          if (prev === null || prev <= 1) {
+            clearTimer();
+            setIsTimerRunning(false);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+  }, [isTimerRunning, durationMinutes, clearTimer]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => clearTimer();
+  }, [clearTimer]);
 
   const ingredients = calculateIngredients(liters, recipe);
 
@@ -91,7 +142,7 @@ export function Dashboard({
   };
 
   const handleConfirmStart = () => {
-    if (!colorName.trim()) return; // Validation check
+    if (!colorName.trim()) return;
     setShowColorModal(false);
     onStartVacuum(durationMinutes, { name: colorName, hex: colorHex });
     setColorName('');
@@ -115,6 +166,17 @@ export function Dashboard({
 
   const handleCancelStop = () => {
     setShowStopModal(false);
+  };
+
+  // Launch a task: set liters + pre-fill color modal
+  const handleLaunchTask = (task: PaintTask) => {
+    setInputValue(String(task.liters));
+    setInputError('');
+    onLitersChange(task.liters);
+    setColorName(task.colorName);
+    setColorHex(task.colorHex || '');
+    onUpdateTaskStatus(task.id, 'in-progress');
+    setShowColorModal(true);
   };
 
   const status = vacuumState.status;
@@ -169,6 +231,9 @@ export function Dashboard({
           color={vacuumState.color}
           liters={vacuumState.volumeLiters || liters}
           isLoading={isLoadingConfig}
+          isFullscreen={isFullscreen}
+          standaloneTimer={standaloneSeconds}
+          isStandaloneTimerRunning={isTimerRunning}
         />
 
         <div className={styles['vacuum-actions']}>
@@ -220,6 +285,40 @@ export function Dashboard({
                 Стоп
               </button>
             </div>
+          )}
+
+          {/* Standalone timer button (Задача 2) — скрыт во время вакумации */}
+          {(status === 'idle' || status === 'stopped' || status === 'completed') && (
+          <button
+            className={`btn btn-sm ${isTimerRunning ? 'btn-secondary' : 'btn-ghost'}`}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              gap: 8,
+              ...(isTimerRunning
+                ? { borderColor: 'var(--warning)', color: 'var(--warning)', backgroundColor: 'var(--warning-light)' }
+                : {}),
+            }}
+            onClick={handleTimerToggle}
+          >
+            {isTimerRunning ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 .49-3" />
+                </svg>
+                Сбросить таймер
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Запустить таймер
+              </>
+            )}
+          </button>
           )}
         </div>
       </div>
@@ -316,6 +415,17 @@ export function Dashboard({
         {/* Vacuum card */}
         <div className={`card ${styles['vacuum-card']}`}>
           {renderVacuumContent(false)}
+        </div>
+
+        {/* Tasks card */}
+        <div className={`card ${styles['tasks-card']}`}>
+          <TaskList
+            tasks={tasks}
+            onAddTask={onAddTask}
+            onRemoveTask={onRemoveTask}
+            onUpdateTaskStatus={onUpdateTaskStatus}
+            onLaunchTask={handleLaunchTask}
+          />
         </div>
       </div>
 

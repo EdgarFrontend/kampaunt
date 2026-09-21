@@ -10,6 +10,7 @@ import { PageLoader } from './components/ui/PageLoader';
 import { useConfig } from './hooks/useConfig';
 import { useVacuumation } from './hooks/useVacuumation';
 import { useTheme } from './hooks/useTheme';
+import { useTasks } from './hooks/useTasks';
 import type { Page, PaintColor } from './types';
 import './index.css';
 
@@ -52,6 +53,8 @@ function App() {
     stop,
     reset,
   } = useVacuumation(liters);
+
+  const { tasks, addTask, removeTask, updateTaskStatus } = useTasks();
 
   const handleLitersChange = (val: number) => {
     setLiters(val);
@@ -103,6 +106,10 @@ function App() {
                 onResumeVacuum={resume}
                 onStopVacuum={stop}
                 reset={reset}
+                tasks={tasks}
+                onAddTask={addTask}
+                onRemoveTask={removeTask}
+                onUpdateTaskStatus={updateTaskStatus}
               />
             )
           )}

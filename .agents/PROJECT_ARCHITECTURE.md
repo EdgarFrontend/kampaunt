@@ -1,7 +1,7 @@
 # КамПаунт (Kampaunt) — Архитектура проекта
 
-> **Последнее обновление:** 2026-09-20
-> **Назначение:** Система управления производством краски — калькулятор компонентов, управление вакумацией, история процессов.
+> **Последнее обновление:** 2026-09-21
+> **Назначение:** Система управления производством краски — калькулятор компонентов, управление вакумацией, история процессов, список задач на производство.
 > **Язык интерфейса:** Русский (ru)
 
 ---
@@ -69,6 +69,7 @@ Kampaunt/
     │   ├── useConfig.ts          # Загрузка/сохранение конфигурации (API + localStorage fallback)
     │   ├── useRecipe.ts          # Устаревший хук рецепта (только localStorage)
     │   ├── useTheme.ts           # Тема: light/dark, localStorage + system preference
+    │   ├── useTasks.ts           # Хук управления задачами производства (localStorage)
     │   ├── useVacuumSettings.ts  # Устаревший хук длительности вакумации (только localStorage)
     │   └── useVacuumation.ts     # Основной хук вакумации: таймер, start/pause/resume/stop, история
     │
@@ -88,12 +89,16 @@ Kampaunt/
     │   │   └── Layout.module.css # Grid-layout: sidebar + main
     │   │
     │   ├── calculator/
-    │   │   ├── IngredientsTable.tsx      # Таблица компонентов краски
+    │   │   ├── IngredientsTable.tsx      # Таблица компонентов краски (+ колонка %)
     │   │   └── IngredientsTable.module.css
     │   │
     │   ├── vacuum/
-    │   │   ├── VacuumTimer.tsx           # Круговой таймер вакумации (SVG ring)
+    │   │   ├── VacuumTimer.tsx           # Круговой таймер вакумации (SVG ring, поддерживает isFullscreen)
     │   │   └── VacuumTimer.module.css
+    │   │
+    │   ├── tasks/
+    │   │   ├── TaskList.tsx              # Список задач на производство (создание, запуск, завершение, удаление)
+    │   │   └── TaskList.module.css
     │   │
     │   └── ui/
     │       ├── PageLoader.tsx            # Анимированный лоадер (SVG капля краски)
@@ -169,6 +174,7 @@ App
 | `kampaunt_vacuum` | Состояние вакумации (JSON `VacuumationState`) |
 | `kampaunt_recipe` | Рецепт (fallback, используется `useConfig`) |
 | `kampaunt_vacuum_duration` | Длительность (fallback) |
+| `kampaunt_tasks` | Список задач производства (JSON `PaintTask[]`) |
 
 ---
 
@@ -193,6 +199,15 @@ interface Recipe {
 interface PaintColor {
   name: string;     // Название цвета
   hex?: string;     // HEX-код (#FFFFFF)
+}
+
+interface PaintTask {
+  id: string;
+  colorName: string;
+  colorHex?: string;
+  liters: number;
+  status: 'pending' | 'in-progress' | 'done';
+  createdAt: number;
 }
 
 type VacuumationStatus = 'idle' | 'running' | 'paused' | 'completed' | 'stopped';
