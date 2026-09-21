@@ -28,3 +28,12 @@ model Configuration {
   value           String   // JSON encoded value
   updatedAt       DateTime @updatedAt
 }
+
+model Task {
+  id          String   @id @default(cuid())
+  colorName   String
+  colorHex    String?
+  liters      Float
+  status      String   // "pending" | "in-progress" | "done"
+  createdAtTs DateTime @default(now())
+}
