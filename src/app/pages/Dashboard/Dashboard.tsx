@@ -15,7 +15,7 @@ const COLOR_PRESETS = [
   { name: 'Зелёный', hex: '#22C55E' },
   { name: 'Синий', hex: '#3B82F6' },
   { name: 'Фиолетовый', hex: '#A855F7' },
-  { name: 'Бежевый>', hex: '#f5f5dc' },
+  { name: 'Бежевый', hex: '#f5f5dc' },
   { name: 'Коричневый>', hex: '#964b00' },
 ];
 
